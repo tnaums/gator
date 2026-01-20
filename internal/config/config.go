@@ -5,30 +5,85 @@ import (
 	"log"
 	"bufio"
 	"io"
-	"fmt"
 	"encoding/json"
 )
 
-type Config struct {
-	DbURL string `json:"db_url"`
-}
+const (
+	configFileName = ".gatorconfig.json"
+)
 
-func READ() Config {
+func getConfigFilePath() (string, error) {
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
+		return "", err
+	}
+	filePath := homePath + "/" + configFileName
+	return filePath, nil
+}
+
+type Config struct {
+	DbURL string `json:"db_url"`
+	CurrentUserName string `json:"current_user_name"`
+}
+
+func write(cfg *Config) error{
+	filePath, err := getConfigFilePath()
+	if err != nil {
+		return err
 	}
 
-	filePath := homePath + "/.gatorconfig.json"
+	file, err := os.Create(filePath)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	defer file.Close()
+
+	j, err := json.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	
+	_, err2 := file.Write(j)
+	if err2 != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Config) SetUser(name string) error {
+	c.CurrentUserName = name
+	err := write(c)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func READ() (Config, error) {
+	var myStruct Config
+	
+	filePath, err := getConfigFilePath()
+	if err != nil {
+		return Config{}, err
+	}
+	
 	file, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
+		return Config{}, err
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	buf := make([]byte, 1024)
-	var myStruct Config
+
+	byteSlice := make([]byte, 0)
 	for {
 		n, err := reader.Read(buf)
 		if err != nil {
@@ -36,16 +91,17 @@ func READ() Config {
 				break
 			}
 			log.Fatal(err)
+			return Config{}, err
 		}
-		fmt.Println(string(buf[:n]))
-		fmt.Println("\n")
+		byteSlice = append(byteSlice, buf[:n]...)
 
-	err2 := json.Unmarshal(buf[:n], &myStruct)
+
+	err2 := json.Unmarshal(byteSlice, &myStruct)
 	if err2 != nil {
 		log.Fatal(err)
+		return Config{}, err2
 	}		
-
 	}
 
-	return myStruct
+	return myStruct, nil
 }
