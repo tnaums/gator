@@ -6,9 +6,6 @@ import (
 )
 
 
-type state struct {
-	configPointer  *config.Config
-}
 
 func main() {
 	fmt.Println("Welcome to the gator!")
@@ -16,10 +13,11 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("Read config: %+v\n", myConfig)
-	myConfig.SetUser("tnaums")
+	myState := state{configPointer: &myConfig}
+	fmt.Printf("Read config: %+v\n", *myState.configPointer)
+	myState.configPointer.SetUser("jerry")
 
-	myConfig, err = config.READ()
+	*myState.configPointer, err = config.READ()
 	if err != nil {
 		fmt.Println(err)
 	}
