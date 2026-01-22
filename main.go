@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gator/internal/config"
+	"os"
 )
 
 
@@ -13,6 +14,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	
 	myState := state{configPointer: &myConfig}
 	fmt.Printf("Read config: %+v\n", *myState.configPointer)
 	myState.configPointer.SetUser("jerry")
@@ -23,4 +25,8 @@ func main() {
 	}
 	fmt.Printf("Database URL: %s\n", myConfig.DbURL)
 	fmt.Printf("Current user: %s\n", myConfig.CurrentUserName)
+	command := NewCommand(os.Args)
+	fmt.Println(command.name)
+	fmt.Println(command.arguments)
+
 }
