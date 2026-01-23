@@ -21,6 +21,8 @@ func main() {
 	fmt.Printf("Current user: %s\n", myConfig.CurrentUserName)
 	command := NewCommand(os.Args)
 
+	myCommands := commands{}
+	myCommands.register(&myState, command)
 	err2 := handlerLogin(&myState, command)
 	if err2 != nil {
 		fmt.Println(err2)
