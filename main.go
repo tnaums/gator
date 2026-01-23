@@ -19,13 +19,18 @@ func main() {
 
 	fmt.Printf("Database URL: %s\n", myConfig.DbURL)
 	fmt.Printf("Current user: %s\n", myConfig.CurrentUserName)
+	if len(os.Args) < 2 {
+		fmt.Println("not enough arguments")
+		os.Exit(1)
+	}
 	command := NewCommand(os.Args)
 
-	myCommands := commands{}
-	myCommands.register(&myState, command)
-	err2 := handlerLogin(&myState, command)
+	myCommands := NewCommands()
+	myCommands.register("login", handlerLogin)
+	err2 := myCommands.run(&myState, command)
 	if err2 != nil {
 		fmt.Println(err2)
+		os.Exit(1)
 	}
 
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"gator/internal/config"
 	"fmt"
-	//	"errors"
+	"errors"
 )
 type state struct {
 	configPointer  *config.Config
@@ -25,16 +25,24 @@ func NewCommand(clargs []string) command {
 type commands struct {
 	handlers    map[string]func(*state, command) error
 }
+func NewCommands() *commands {
+	var c commands
+	c.handlers = make(map[string]func(*state, command) error)
+	return &c
+}
 
 
 func (c *commands) run(s *state, cmd command) error {
 	fmt.Println("Running...")
-	return nil
+	myFunc, ok := c.handlers[cmd.name]
+	if !ok {
+		return errors.New("Command not found")
+	}
+	return myFunc(s, cmd)
 }
 
-func (c *commands) register(s *state, cmd command) error {
+func (c *commands) register(name string, f func(*state, command) error) {
 	fmt.Println("Registering...")
-	c.handlers["login"] = handlerLogin
-	return nil
+	c.handlers[name] = f
 }
 
