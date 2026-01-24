@@ -2,7 +2,6 @@ package main
 
 import (
 	"gator/internal/config"
-	"fmt"
 	"errors"
 )
 type state struct {
@@ -33,7 +32,6 @@ func NewCommands() *commands {
 
 
 func (c *commands) run(s *state, cmd command) error {
-	fmt.Println("Running...")
 	myFunc, ok := c.handlers[cmd.name]
 	if !ok {
 		return errors.New("Command not found")
@@ -42,7 +40,6 @@ func (c *commands) run(s *state, cmd command) error {
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
-	fmt.Println("Registering...")
 	c.handlers[name] = f
 }
 
