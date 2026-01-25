@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"gator/internal/config"
 	"os"
+	"database/sql"
 )
 
-
+import _ "github.com/lib/pq"
 
 func main() {
 	fmt.Println("Welcome to the gator!")
@@ -14,10 +15,11 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
 	myState := state{configPointer: &myConfig}
 
 	fmt.Printf("Database URL: %s\n", myConfig.DbURL)
+	db, err := sql.Open("postgres", myConfig.DbURL)
+	dbQueries := database.New(db)	
 	fmt.Printf("Current user: %s\n", myConfig.CurrentUserName)
 	if len(os.Args) < 2 {
 		fmt.Println("not enough arguments")

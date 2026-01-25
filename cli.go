@@ -4,7 +4,9 @@ import (
 	"gator/internal/config"
 	"errors"
 )
+
 type state struct {
+	db  *database.Queries
 	configPointer  *config.Config
 }
 
