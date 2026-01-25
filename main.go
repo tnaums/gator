@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"gator/internal/config"
+	"log"
 	"os"
 	"database/sql"
+	"gator/internal/database"	
 )
 
 import _ "github.com/lib/pq"
@@ -15,11 +17,21 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	myState := state{configPointer: &myConfig}
+
 
 	fmt.Printf("Database URL: %s\n", myConfig.DbURL)
 	db, err := sql.Open("postgres", myConfig.DbURL)
-	dbQueries := database.New(db)	
+	if err != nil {
+		log.Fatalf("error connecting to db: %v", err)
+	}
+	defer db.Close()	
+
+	dbQueries := database.New(db)
+	myState := &state{
+		db:  dbQueries,
+		configPointer: &myConfig,
+	}
+	
 	fmt.Printf("Current user: %s\n", myConfig.CurrentUserName)
 	if len(os.Args) < 2 {
 		fmt.Println("not enough arguments")
@@ -29,7 +41,7 @@ func main() {
 
 	myCommands := NewCommands()
 	myCommands.register("login", handlerLogin)
-	err2 := myCommands.run(&myState, command)
+	err2 := myCommands.run(myState, command)
 	if err2 != nil {
 		fmt.Println(err2)
 		os.Exit(1)

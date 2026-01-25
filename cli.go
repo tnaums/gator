@@ -3,6 +3,7 @@ package main
 import (
 	"gator/internal/config"
 	"errors"
+	"gator/internal/database"
 )
 
 type state struct {
