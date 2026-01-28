@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"context"
 	"gator/internal/config"
 	"gator/internal/database"
 	_ "github.com/lib/pq"
@@ -40,6 +39,7 @@ func main() {
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
+	cmds.register("agg", handlerAgg)
 	
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")
@@ -52,6 +52,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx, _ := context.WithCancel(context.Background())
-	fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+
 }

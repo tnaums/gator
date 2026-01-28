@@ -4,10 +4,33 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"html"
 
 	"gator/internal/database"
 	"github.com/google/uuid"
 )
+
+func handlerAgg(s *state, cmd command) error {
+	// if len(cmd.Args) != 1 {
+	// 	return fmt.Errorf("usage: %v <name>", cmd.Name)
+	// }
+	
+	ctx, _ := context.WithCancel(context.Background())
+	r, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+	//	r, err := fetchFeed(ctx, cmd.Args[0])	
+	if err != nil {
+		return fmt.Errorf("failed to retrieve rss feed: %w", err)
+	}
+
+	fmt.Printf("Title: %#v\n", html.UnescapeString(r.Channel.Title))
+	fmt.Printf("Link: %#v\n", r.Channel.Link)
+	fmt.Printf("Description: %#v\n", r.Channel.Description)
+	for _, item := range r.Channel.Item {
+		fmt.Printf("Title: %#v\n", html.UnescapeString(item.Title))
+		fmt.Printf("Title: %#v\n", html.UnescapeString(item.Description))
+	}
+	return nil
+}
 
 func handlerUsers(s *state, cmd command) error {
 	Users, err := s.db.ListUsers(context.Background())
