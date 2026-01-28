@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
-
+	"context"
 	"gator/internal/config"
 	"gator/internal/database"
 	_ "github.com/lib/pq"
@@ -52,4 +52,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	ctx, _ := context.WithCancel(context.Background())
+	fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
 }
