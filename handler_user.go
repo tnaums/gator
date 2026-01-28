@@ -10,6 +10,39 @@ import (
 	"github.com/google/uuid"
 )
 
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.Args) !=2 {
+		return fmt.Errorf("usage: %v <name> <url>", cmd.Name)
+	}
+	cu, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return fmt.Errorf("failed to get user %s: %v", s.cfg.CurrentUserName, err)
+	}
+
+	name := cmd.Args[0]
+	url := cmd.Args[1]
+
+	f, err := s.db.CreateFeeds(context.Background(), database.CreateFeedsParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      name,
+		Url:       url,
+		UserID:    cu.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't create feed %s: %w", name, err)
+	}
+	fmt.Printf("ID: %s\n", f.ID)
+	fmt.Printf("Created At: %w\n", f.CreatedAt)
+	fmt.Printf("Updated At: %w\n", f.UpdatedAt)
+	fmt.Printf("Name: %s\n", f.Name)
+	fmt.Printf("Url: %s\n", f.Url)
+	fmt.Printf("UserID: %s\n", f.UserID)
+
+	return nil
+}
+
 func handlerAgg(s *state, cmd command) error {
 	// if len(cmd.Args) != 1 {
 	// 	return fmt.Errorf("usage: %v <name>", cmd.Name)
