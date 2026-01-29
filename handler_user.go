@@ -74,7 +74,8 @@ func handlerAgg(s *state, cmd command) error {
 	// }
 	
 	ctx, _ := context.WithCancel(context.Background())
-	r, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+	//	r, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+	r, err := fetchFeed(ctx, "https://hnrss.org/newest")
 	//	r, err := fetchFeed(ctx, cmd.Args[0])	
 	if err != nil {
 		return fmt.Errorf("failed to retrieve rss feed: %w", err)
