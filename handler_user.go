@@ -10,6 +10,31 @@ import (
 	"github.com/google/uuid"
 )
 
+func handlerListFeeds(s *state, cmd command) error {
+	fmt.Println("Listing Feeds...")
+
+	Feeds, err := s.db.ListFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to get list of feeds: %w", err)
+	}
+
+	fmt.Println()
+	for _, feed := range Feeds {
+		fmt.Println("----------------------------------------")
+		fmt.Printf("* %s\n", feed.Name)
+		fmt.Printf("* %s\n", feed.Url)
+		u, err := s.db.GetByID(context.Background(), feed.UserID)
+		if err != nil {
+			return fmt.Errorf("failed to get user for feed: %w", err)
+		}
+		
+		fmt.Printf("* %s\n", u.Name)
+		fmt.Println("----------------------------------------")
+	}
+
+	return nil
+}
+
 func handlerAddFeed(s *state, cmd command) error {
 	if len(cmd.Args) !=2 {
 		return fmt.Errorf("usage: %v <name> <url>", cmd.Name)
@@ -34,8 +59,8 @@ func handlerAddFeed(s *state, cmd command) error {
 		return fmt.Errorf("couldn't create feed %s: %w", name, err)
 	}
 	fmt.Printf("ID: %s\n", f.ID)
-	fmt.Printf("Created At: %w\n", f.CreatedAt)
-	fmt.Printf("Updated At: %w\n", f.UpdatedAt)
+	fmt.Printf("Created At: %s\n", f.CreatedAt)
+	fmt.Printf("Updated At: %s\n", f.UpdatedAt)
 	fmt.Printf("Name: %s\n", f.Name)
 	fmt.Printf("Url: %s\n", f.Url)
 	fmt.Printf("UserID: %s\n", f.UserID)
