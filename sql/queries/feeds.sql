@@ -16,3 +16,6 @@ ORDER BY name;
 
 -- name: FeedByUrl :one
 SELECT * FROM feeds WHERE url = $1;
+
+-- name: FeedById :one
+SELECT * FROM feeds WHERE id = $1;

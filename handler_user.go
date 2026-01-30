@@ -10,6 +10,37 @@ import (
 	"github.com/google/uuid"
 )
 
+func handlerFollowing(s *state, cmd command) error {
+	user := s.cfg.CurrentUserName
+	fmt.Println()
+	fmt.Printf("Followed feeds for user %s\n", user)
+	fmt.Println("-----------------------------------")
+
+	// Get user id for current user
+	u, err := s.db.GetUser(context.Background(), user)
+	if err != nil {
+		return fmt.Errorf("failed to get id for %s", user)
+	}
+
+	// Get slice of FeedFollow type for current user using user.ID
+	ff, err := s.db.GetFeedFollowsForUser(context.Background(), u.ID)
+	if err != nil {
+		return fmt.Errorf("failed to get feed follows for %s", user)
+	}
+
+	// Iterate over the feed follows for current user
+	for idx, follow := range ff {
+		feed, err := s.db.FeedById(context.Background(), follow.FeedID)
+		if err != nil {
+			return fmt.Errorf("failed to get feed name for id %s", follow.FeedID)
+		}
+		fmt.Printf(" %d. %s\n", idx + 1, feed.Name)
+	}
+	fmt.Println()
+	
+	return nil
+}
+
 func handlerFollow(s *state, cmd command) error {
 	if len(cmd.Args) !=1 {
 		return fmt.Errorf("usage: %v <url>", cmd.Name)
